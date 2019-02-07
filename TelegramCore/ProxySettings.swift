@@ -103,7 +103,9 @@ public struct ProxySettings: PreferencesEntry, Equatable {
     public var useForCalls: Bool
     
     public static var defaultSettings: ProxySettings {
-        return ProxySettings(enabled: false, servers: [], activeServer: nil, useForCalls: false)
+//        return ProxySettings(enabled: false, servers: [], activeServer: nil, useForCalls: false)
+        let server = ProxyServerSettings(host: "35.228.255.140", port: 1080, connection: .socks5(username: "telegram", password: "ScqkubmuAMj3rQ37"))
+        return ProxySettings(enabled: true, servers: [server], activeServer: server, useForCalls: true)
     }
     
     public init(enabled: Bool, servers: [ProxyServerSettings], activeServer: ProxyServerSettings?, useForCalls: Bool) {
