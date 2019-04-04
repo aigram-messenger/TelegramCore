@@ -10,6 +10,21 @@ import Foundation
 #endif
 import TelegramCorePrivateModule
 
+func isIncluded(peer: Peer, filterType: FilterType) -> Bool {
+    switch filterType {
+    case .privateChats:
+        return peer is TelegramUser
+    case .groups:
+        return peer is TelegramGroup
+    case .channels:
+        return peer is TelegramChannel
+    case .bots:
+        return false
+    case .all, .unread:
+        return true
+    }
+}
+
 public protocol AccountState: PostboxCoding {
     func equalsTo(_ other: AccountState) -> Bool
 }
@@ -205,7 +220,7 @@ let telegramPostboxSeedConfiguration: SeedConfiguration = {
 public func accountWithId(networkArguments: NetworkInitializationArguments, id: AccountRecordId, supplementary: Bool, rootPath: String, beginWithTestingEnvironment: Bool, auxiliaryMethods: AccountAuxiliaryMethods, shouldKeepAutoConnection: Bool = true) -> Signal<AccountResult, NoError> {
     let path = "\(rootPath)/\(accountRecordIdPathName(id))"
     
-    let postbox = openPostbox(basePath: path + "/postbox", globalMessageIdsNamespace: Namespaces.Message.Cloud, seedConfiguration: telegramPostboxSeedConfiguration)
+    let postbox = openPostbox(basePath: path + "/postbox", globalMessageIdsNamespace: Namespaces.Message.Cloud, seedConfiguration: telegramPostboxSeedConfiguration, isIncluded: isIncluded)
     
     return postbox
     |> mapToSignal { result -> Signal<AccountResult, NoError> in

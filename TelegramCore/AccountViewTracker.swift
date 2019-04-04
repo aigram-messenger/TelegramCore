@@ -227,7 +227,11 @@ public final class AccountViewTracker {
     let chatHistoryPreloadManager: ChatHistoryPreloadManager
     
     private let historyViewStateValidationContexts: HistoryViewStateValidationContexts
-    
+
+    public func set(filterType: FilterType) {
+        
+    }
+
     init(account: Account) {
         self.account = account
         
@@ -991,7 +995,7 @@ public final class AccountViewTracker {
     
     public func tailChatListView(groupId: PeerGroupId?, count: Int) -> Signal<(ChatListView, ViewUpdateType), NoError> {
         if let account = self.account {
-            return self.wrappedChatListView(signal: account.postbox.tailChatListView(groupId: groupId, count: count, summaryComponents: ChatListEntrySummaryComponents(tagSummary: ChatListEntryMessageTagSummaryComponent(tag: .unseenPersonalMessage, namespace: Namespaces.Message.Cloud), actionsSummary: ChatListEntryPendingMessageActionsSummaryComponent(type: PendingMessageActionType.consumeUnseenPersonalMessage, namespace: Namespaces.Message.Cloud)), filter: Filter(filterType: .groups)))
+            return self.wrappedChatListView(signal: account.postbox.tailChatListView(groupId: groupId, count: count, summaryComponents: ChatListEntrySummaryComponents(tagSummary: ChatListEntryMessageTagSummaryComponent(tag: .unseenPersonalMessage, namespace: Namespaces.Message.Cloud), actionsSummary: ChatListEntryPendingMessageActionsSummaryComponent(type: PendingMessageActionType.consumeUnseenPersonalMessage, namespace: Namespaces.Message.Cloud))))
         } else {
             return .never()
         }
@@ -999,52 +1003,11 @@ public final class AccountViewTracker {
     
     public func aroundChatListView(groupId: PeerGroupId?, index: ChatListIndex, count: Int) -> Signal<(ChatListView, ViewUpdateType), NoError> {
         if let account = self.account {
-            return self.wrappedChatListView(signal: account.postbox.aroundChatListView(groupId: groupId, index: index, count: count, summaryComponents: ChatListEntrySummaryComponents(tagSummary: ChatListEntryMessageTagSummaryComponent(tag: .unseenPersonalMessage, namespace: Namespaces.Message.Cloud), actionsSummary: ChatListEntryPendingMessageActionsSummaryComponent(type: PendingMessageActionType.consumeUnseenPersonalMessage, namespace: Namespaces.Message.Cloud)), filter: Filter(filterType: .groups)))
+            return self.wrappedChatListView(signal: account.postbox.aroundChatListView(groupId: groupId, index: index, count: count, summaryComponents: ChatListEntrySummaryComponents(tagSummary: ChatListEntryMessageTagSummaryComponent(tag: .unseenPersonalMessage, namespace: Namespaces.Message.Cloud), actionsSummary: ChatListEntryPendingMessageActionsSummaryComponent(type: PendingMessageActionType.consumeUnseenPersonalMessage, namespace: Namespaces.Message.Cloud))))
         } else {
             return .never()
         }
     }
 }
 
-enum FilterType {
-    case privateChats
-    case groups
-    case channels
-    case bots
-    case all
-}
 
-final class Filter: GroupingFilter {
-
-    typealias PeerFetchingClosure = (PeerId) -> Peer?
-
-    var fetchPeer: PeerFetchingClosure?
-
-    private let filterType: FilterType
-
-    init(filterType: FilterType) {
-        self.filterType = filterType
-    }
-
-    func isIncluded(_ peer: Peer) -> Bool {
-        switch filterType {
-        case .privateChats:
-            return peer is TelegramUser
-        case .groups:
-            return peer is TelegramGroup
-        case .channels:
-            return peer is TelegramChannel
-        case .bots:
-            return false
-        case .all:
-            return true
-        }
-    }
-
-    func isIncluded(_ peerId: PeerId) -> Bool {
-        return fetchPeer?(peerId).map {
-            isIncluded($0)
-        } ?? false
-    }
-
-}
