@@ -13,13 +13,16 @@ import TelegramCorePrivateModule
 func isIncluded(peer: Peer, filterType: FilterType) -> Bool {
     switch filterType {
     case .privateChats:
-        return peer is TelegramUser
+        guard let user = peer as? TelegramUser else {
+            return false
+        }
+        return user.botInfo == nil
     case .groups:
         return peer is TelegramGroup
     case .channels:
         return peer is TelegramChannel
     case .bots:
-        return false
+        return (peer as? TelegramUser)?.botInfo != nil
     case .all, .unread:
         return true
     }
