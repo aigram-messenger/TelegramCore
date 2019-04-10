@@ -227,7 +227,11 @@ public final class AccountViewTracker {
     let chatHistoryPreloadManager: ChatHistoryPreloadManager
     
     private let historyViewStateValidationContexts: HistoryViewStateValidationContexts
-    
+
+    public func set(filterType: FilterType) {
+        
+    }
+
     init(account: Account) {
         self.account = account
         
@@ -1005,3 +1009,5 @@ public final class AccountViewTracker {
         }
     }
 }
+
+

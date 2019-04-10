@@ -171,7 +171,7 @@ public func temporaryAccount(manager: AccountManager, rootPath: String) -> Signa
     return manager.allocatedTemporaryAccountId()
     |> mapToSignal { id -> Signal<TemporaryAccount, NoError> in
         let path = "\(rootPath)/\(accountRecordIdPathName(id))"
-        return openPostbox(basePath: path + "/postbox", globalMessageIdsNamespace: Namespaces.Message.Cloud, seedConfiguration: telegramPostboxSeedConfiguration)
+        return openPostbox(basePath: path + "/postbox", globalMessageIdsNamespace: Namespaces.Message.Cloud, seedConfiguration: telegramPostboxSeedConfiguration, isIncluded: isIncluded)
         |> mapToSignal { result -> Signal<TemporaryAccount, NoError> in
             switch result {
                 case .upgrading:
