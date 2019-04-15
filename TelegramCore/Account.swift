@@ -18,9 +18,15 @@ func isIncluded(peer: Peer, filterType: FilterType) -> Bool {
         }
         return user.botInfo == nil
     case .groups:
+        if let superGroup = peer as? TelegramChannel, case .group = superGroup.info {
+            return true
+        }
         return peer is TelegramGroup
     case .channels:
-        return peer is TelegramChannel
+        guard let channel = peer as? TelegramChannel, case .broadcast = channel.info else {
+            return false
+        }
+        return true
     case .bots:
         return (peer as? TelegramUser)?.botInfo != nil
     case .all, .unread:
